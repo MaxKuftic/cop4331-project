@@ -206,7 +206,17 @@ import Card from '../components/Card.astro';
 						<div id="betting">
 							<table id="betTable">
 								<tbody>
-
+									<tr id="betInputRow" style="display:none;">
+										<td>Bet Amount:</td>
+										<td>
+											<input type="number" id="betAmount" placeholder="Enter your bet" min="1">
+										</td>
+									</tr>
+									<tr id="betButtonRow" style="display:none;">
+										<td colspan="2">
+											<button id="placeBetButton">Place Bet</button>
+										</td>
+									</tr>
 								</tbody>
 							</table>
 
@@ -578,11 +588,41 @@ import Card from '../components/Card.astro';
 						addNewRow();
 					}
 
+					const checkboxes = document.querySelectorAll('#betTable input[type="checkbox"]') as NodeListOf<HTMLInputElement>;
+      				checkboxes.forEach(checkbox => {
+        				checkbox.addEventListener('change', () => {
+          					checkboxes.forEach(box => {
+            					if (box !== checkbox) box.checked = false;
+          					});
+							const betInputRow = document.getElementById('betInputRow');
+							const betButtonRow = document.getElementById('betButtonRow');
+							if (betInputRow && betButtonRow)
+							{
+								betInputRow.style.display = checkbox.checked ? '' : 'none';
+      							betButtonRow.style.display = checkbox.checked ? '' : 'none';
+							}
+        				});
+      				});
 
-
+      				const placeBetButton = document.getElementById('placeBetButton');
+					if (placeBetButton) {
+						placeBetButton.addEventListener('click', () => {
+							const selectedCheckbox = Array.from(checkboxes).find(box => box.checked);
+							const selectedHorse = selectedCheckbox?.parentElement?.parentElement?.firstElementChild?.textContent || null;
+							const betAmountInput = document.getElementById('betAmount') as HTMLInputElement | null;
+							const betAmount = betAmountInput ? betAmountInput.value : null;
+						  if (selectedHorse && betAmount) {
+								console.log(`Bet placed on ${selectedHorse} for $${betAmount}`);
+								//Send bet information to the server
+						  } else {
+								console.log('Please select a horse and enter a bet amount.');
+						  }
+					
 				});
+			}
 
 			});
+		});
 
 		</script>
 
